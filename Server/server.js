@@ -2,6 +2,8 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 
+const VbGame = require('./vbgame')
+
 const app = express();
 
 const clientPath = `${__dirname}/../Client`;
@@ -12,9 +14,20 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
+let waitingPlayer = null;
+
 io.on('connection', (sock) => {
-    console.log("Someone Connected");
-    sock.emit('message', 'Hi, you are now connected');
+    
+    if(waitingPlayer){
+        new VbGame(waitingPlayer, sock);
+        waitingPlayer=null;
+        
+    }else{
+        waitingPlayer=sock;
+        waitingPlayer.emit('message', 'Esperando a un oponente')
+    }
+    
+
     
     sock.on('message', (text) => {
         io.emit('message', text);

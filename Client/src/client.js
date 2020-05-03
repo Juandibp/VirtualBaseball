@@ -18,8 +18,19 @@ const onFormSubmitted= (e) =>{
     sock.emit('message', text);
 };
 
+const addButtonListeners = () => {
+    ['roll'].forEach((id) => {
+        const button = document.getElementById(id);
+        button.addEventListener('click', ()=> {
+            sock.emit('turn', id);
+        });
+    });
+};
+
 writeEvent('Welcome to Virtual Baseball!')
 const sock =io();
 sock.on('message', writeEvent)
 
 document.querySelector('#chat-form').addEventListener('submit', onFormSubmitted);
+
+addButtonListeners();
